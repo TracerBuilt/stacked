@@ -1,4 +1,18 @@
-import { MongoClient } from "mongodb";
+import { Db, MongoClient } from "mongodb";
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      mongo: {
+        conn: {
+          client: MongoClient;
+          db: Db;
+        } | null;
+        promise: Promise<{ client: MongoClient; db: Db }> | null;
+      };
+    }
+  }
+}
 
 const { MONGODB_URI, MONGODB_DB } = process.env;
 
@@ -36,7 +50,7 @@ export async function connectToDatabase() {
       useUnifiedTopology: true,
     };
 
-    cached.promise = MongoClient.connect(MONGODB_URI, opts).then((client) => {
+    cached.promise = MongoClient.connect(MONGODB_URI!, opts).then((client) => {
       return {
         client,
         db: client.db(MONGODB_DB),
